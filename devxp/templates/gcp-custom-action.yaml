@@ -1,0 +1,56 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: gcp-custom-action
+  title: GCP custom Action Templates[Custom Functions]
+  description: Action on GCP with custom action 
+
+  tags:
+    - gcp
+    - custom
+    - infrastructure
+    - bucket
+    - resource
+spec:
+  owner: group:sre-team
+  type: resource
+
+  parameters:
+    - title: Custom action 
+      properties:
+        contents:
+          title: The contents of the file
+          description: 'The contents of the file'
+          type: string
+        filename:
+          title: Filename
+          type: string
+          description: The filename of the file that will be created.
+        dryRun:
+          title: Only perform a dry run, don't publish anything
+          type: boolean
+          default: false
+
+
+  steps:
+    - id: createTemplateAction
+      name: Custom Function File Creation Testing
+      action: mycompany:create-file
+      input:
+          contents: ${{ parameters.contents }}
+          filename: ${{ parameters.filename }}
+
+
+    - name: Results
+      if: ${{ parameters.dryRun }}
+      action: debug:log
+      input:
+        listWorkspace: true
+
+  output:
+    links:
+      - title: Go to GitOps Pull Request
+        url: ${{ steps.open-pr.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
